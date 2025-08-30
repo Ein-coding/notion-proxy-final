@@ -5,20 +5,24 @@ const axios = require('axios');
 // 建立 Express 應用程式
 const app = express();
 
-// 定義主路由，這是一個異步函數
+// 定義主路由
 app.get('*', async (req, res) => {
     try {
-        // 動態載入 opencc-js 套件
+        // 動態載入 opencc-js
         const { Converter } = await import('opencc-js');
-
-        // 建立轉換器：'cn' 到 'tw' (簡體到臺灣正體)
         const converter = Converter({ from: 'cn', to: 'tw' });
 
-        // 目標網站的 URL (專為嵌入設計的乾淨版本)
         const targetUrl = 'https://rili-d.jin10.com/open.php?fontSize=14px&scrolling=yes&theme=primary';
 
-        // 抓取原始網頁內容
+        // 【*** 這裡就是修改的地方 ***】
+        // 設定請求標頭，偽裝成瀏覽器
+        const headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        };
+
+        // 發送請求時帶上新的標頭
         const response = await axios.get(targetUrl, {
+            headers: headers,
             responseType: 'text',
         });
         const originalHtml = response.data;
